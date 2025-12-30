@@ -1,3 +1,4 @@
+import { Colors } from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
 import { useUserStore } from "@/store/userStore";
 import * as Application from "expo-application";
@@ -90,6 +91,7 @@ export default function SettingsScreen() {
           </View>
         </View>
       </View>
+      <View style={styles.separator} />
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Bizga Yozish</Text>
@@ -128,7 +130,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Colors.light.background,
   },
   content: {
     padding: 16,
@@ -137,24 +139,18 @@ const styles = StyleSheet.create({
   header: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#333",
+    color: Colors.light.text,
     marginBottom: 24,
   },
   section: {
-    backgroundColor: "white",
-    borderRadius: 12,
+    backgroundColor: Colors.light.background,
     padding: 16,
     marginBottom: 24,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
   },
   sectionTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#2E7D32",
+    color: Colors.light.primary,
     marginBottom: 16,
   },
   row: {
@@ -166,23 +162,23 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#666",
+    color: Colors.light.text,
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#F9F9F9",
+    backgroundColor: "#fff",
     borderWidth: 1,
-    borderColor: "#EEE",
+    borderColor: "#EEE", // Consider updating if needed, else keep neutral
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
-    color: "#333",
+    color: Colors.light.text,
   },
   textArea: {
     height: 100,
   },
   button: {
-    backgroundColor: "#2E7D32",
+    backgroundColor: Colors.light.primary,
     borderRadius: 12,
     padding: 16,
     alignItems: "center",
@@ -192,8 +188,13 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: "white",
+    color: Colors.light.background,
     fontSize: 16,
     fontWeight: "bold",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: Colors.light.primaryDisabled,
+    // marginVertical: 16,
   },
 });

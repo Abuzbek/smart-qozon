@@ -66,7 +66,7 @@ export function IngredientSelector({
           placeholder="Masalliq qidirish..."
           value={searchQuery}
           onChangeText={setSearchQuery}
-          placeholderTextColor="#999"
+          placeholderTextColor={Colors.light.text}
         />
       </View>
 
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     fontWeight: "600",
-    color: "#333",
+    color: Colors.light.text,
     marginBottom: 12,
     marginLeft: 4,
   },
@@ -108,13 +108,13 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   searchInput: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 12,
     padding: 12,
     fontSize: 16,
-    color: "#333",
+    color: Colors.light.text,
   },
   grid: {
     flexDirection: "row",
@@ -124,7 +124,7 @@ const styles = StyleSheet.create({
   chip: {
     paddingHorizontal: 16,
     paddingVertical: 10,
-    backgroundColor: "white",
+    backgroundColor: Colors.light.background,
     borderRadius: 24,
     borderWidth: 1,
     borderColor: "#E0E0E0",
@@ -135,16 +135,16 @@ const styles = StyleSheet.create({
     shadowRadius: 1,
   },
   chipSelected: {
-    backgroundColor: Colors.light.tint,
-    borderColor: Colors.light.tint,
+    backgroundColor: Colors.light.primary,
+    borderColor: Colors.light.primary,
   },
   chipText: {
     fontSize: 14,
-    color: "#666",
+    color: Colors.light.text,
     fontWeight: "500",
   },
   chipTextSelected: {
-    color: "white",
+    color: Colors.light.background,
     fontWeight: "600",
   },
 });

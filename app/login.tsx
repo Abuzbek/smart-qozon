@@ -143,7 +143,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Colors.light.background,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   content: {
@@ -158,13 +158,13 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "bold",
-    color: "#333",
+    color: Colors.light.text,
     textAlign: "center",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: Colors.light.text,
     textAlign: "center",
     marginBottom: 40,
   },
@@ -173,18 +173,18 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 14,
-    color: "#666",
+    color: Colors.light.text,
     marginBottom: 8,
     marginLeft: 4,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: Colors.light.background,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 12,
     padding: 16,
     fontSize: 18,
-    color: "#333",
+    color: Colors.light.text,
   },
   button: {
     backgroundColor: Colors.light.tint,
@@ -201,7 +201,7 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   buttonText: {
-    color: "white",
+    color: Colors.light.background,
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -209,7 +209,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: "white",
+    backgroundColor: Colors.light.background,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
   },
   counterLabel: {
     fontSize: 16,
-    color: "#333",
+    color: Colors.light.text,
     fontWeight: "500",
   },
   counterControls: {
@@ -230,14 +230,14 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: "#F0F8FF",
+    backgroundColor: Colors.light.background, // Or a lighter shade if needed
     alignItems: "center",
     justifyContent: "center",
   },
   counterValue: {
     fontSize: 18,
     fontWeight: "bold",
-    color: "#333",
+    color: Colors.light.text,
     minWidth: 24,
     textAlign: "center",
   },

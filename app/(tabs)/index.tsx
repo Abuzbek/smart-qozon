@@ -127,7 +127,7 @@ export default function HomeScreen() {
             onPress={() => setRecipes(null)}
             style={styles.iconButton}
           >
-            <ArrowLeft size={24} color="#333" />
+            <ArrowLeft size={24} color={Colors.light.text} />
             <Text style={styles.backText}>Orqaga</Text>
           </TouchableOpacity>
         </View>
@@ -136,7 +136,7 @@ export default function HomeScreen() {
             <ResultCard key={index} recipe={recipe} />
           ))}
           <TouchableOpacity style={styles.resetButton} onPress={reset}>
-            <RotateCcw size={20} color="white" />
+            <RotateCcw size={20} color={Colors.light.background} />
             <Text style={styles.resetButtonText}>Boshqasini izlash</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -175,7 +175,11 @@ export default function HomeScreen() {
           disabled={loading}
           activeOpacity={0.8}
         >
-          <ChefHat size={24} color="white" style={{ marginRight: 8 }} />
+          <ChefHat
+            size={24}
+            color={Colors.light.background}
+            style={{ marginRight: 8 }}
+          />
           <Text style={styles.fabText}>
             Retsept Topish ({selectedIngredients.length})
           </Text>
@@ -188,14 +192,14 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Colors.light.background,
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   loadingContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Colors.light.background,
   },
   loadingText: {
     marginTop: 20,
@@ -206,7 +210,7 @@ const styles = StyleSheet.create({
   loadingSubText: {
     marginTop: 8,
     fontSize: 14,
-    color: "#666",
+    color: Colors.light.text,
   },
   scrollContent: {
     padding: 20,
@@ -228,11 +232,11 @@ const styles = StyleSheet.create({
   appTitle: {
     fontSize: 28,
     fontWeight: "bold",
-    color: "#333",
+    color: Colors.light.text,
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: Colors.light.text,
     textAlign: "center",
     marginBottom: 30,
     lineHeight: 22,
@@ -258,11 +262,11 @@ const styles = StyleSheet.create({
     elevation: 6,
   },
   fabDisabled: {
-    backgroundColor: "#A5D6A7", // Light green
+    backgroundColor: Colors.light.primaryDisabled,
     elevation: 0,
   },
   fabText: {
-    color: "white",
+    color: Colors.light.background,
     fontSize: 18,
     fontWeight: "bold",
   },
@@ -273,7 +277,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     fontSize: 16,
-    color: "#333",
+    color: Colors.light.text,
     marginLeft: 4,
     fontWeight: "500",
   },
@@ -285,14 +289,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#666",
+    backgroundColor: Colors.light.icon,
     padding: 16,
     borderRadius: 12,
     gap: 8,
     marginTop: -10,
   },
   resetButtonText: {
-    color: "white",
+    color: Colors.light.background,
     fontSize: 16,
     fontWeight: "bold",
   },

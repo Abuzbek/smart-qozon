@@ -23,7 +23,7 @@ export function ResultCard({ recipe }: ResultCardProps) {
 
       <View style={styles.metaRow}>
         <View style={styles.metaItem}>
-          <Clock size={16} color="#666" />
+          <Clock size={16} color={Colors.light.text} />
           <Text style={styles.metaText}>{recipe.cooking_time}</Text>
         </View>
       </View>
@@ -58,7 +58,7 @@ export function ResultCard({ recipe }: ResultCardProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "white",
+    backgroundColor: Colors.light.background,
     borderRadius: 16,
     padding: 20,
     width: "100%",
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#333",
+    color: Colors.light.text,
     marginBottom: 12,
     textAlign: "center",
   },
@@ -86,19 +86,19 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: Colors.light.background,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
   },
   metaText: {
-    color: "#666",
+    color: Colors.light.text,
     fontSize: 14,
     fontWeight: "500",
   },
   description: {
     fontSize: 16,
-    color: "#555",
+    color: "#555", // Maybe update to text color?
     textAlign: "center",
     marginBottom: 20,
     fontStyle: "italic",
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: "bold",
-    color: Colors.light.tint,
+    color: Colors.light.primary,
     marginBottom: 12,
   },
   ingredientRow: {
@@ -121,18 +121,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   bullet: {
-    color: Colors.light.tint,
+    color: Colors.light.primary,
     fontSize: 18,
     marginRight: 8,
   },
   ingredientName: {
     fontSize: 16,
-    color: "#333",
+    color: Colors.light.text,
     flex: 1,
   },
   ingredientAmount: {
     fontSize: 16,
-    color: "#666",
+    color: Colors.light.text,
     fontWeight: "500",
   },
   stepRow: {
@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: Colors.light.tint,
+    backgroundColor: Colors.light.primary,
     alignItems: "center",
     justifyContent: "center",
     marginRight: 12,
@@ -157,7 +157,7 @@ const styles = StyleSheet.create({
   stepText: {
     flex: 1,
     fontSize: 16,
-    color: "#444",
+    color: Colors.light.text,
     lineHeight: 24,
   },
 });
