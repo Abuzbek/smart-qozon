@@ -1,0 +1,190 @@
+import { supabase } from "@/lib/supabase";
+import * as Application from "expo-application";
+import { useState } from "react";
+import {
+  Alert,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
+
+export default function SettingsScreen() {
+  const [message, setMessage] = useState("");
+  const [phone, setPhone] = useState("+998 ");
+  const [loading, setLoading] = useState(false);
+
+  // Family Profile State (Mocked initially or local state)
+  const [adults, setAdults] = useState("2");
+  const [children, setChildren] = useState("2");
+
+  const handleFeedbackSubmit = async () => {
+    if (!message) {
+      Alert.alert("Xatolik", "Iltimos, xabarni kiriting");
+      return;
+    }
+    setLoading(true);
+    try {
+      let deviceId = "unknown";
+      if (Platform.OS === "ios") {
+        deviceId = (await Application.getIosIdForVendorAsync()) || "unknown";
+      } else {
+        deviceId = Application.getAndroidId() || "unknown";
+      }
+
+      const { error } = await supabase.from("feedbacks").insert({
+        user_device_id: deviceId,
+        message: message,
+        phone_number: phone,
+      });
+
+      if (error) throw error;
+
+      Alert.alert("Rahmat!", "Xabaringiz qabul qilindi.");
+      setMessage("");
+      setPhone("+998 ");
+    } catch (e) {
+      console.error(e);
+      Alert.alert("Xatolik", "Xabar yuborishda xatolik yuz berdi.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <Text style={styles.header}>Sozlamalar</Text>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Oilaviy holat</Text>
+        <View style={styles.row}>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Kattalar</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={adults}
+              onChangeText={setAdults}
+            />
+          </View>
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Bolalar</Text>
+            <TextInput
+              style={styles.input}
+              keyboardType="numeric"
+              value={children}
+              onChangeText={setChildren}
+            />
+          </View>
+        </View>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Bizga Yozish</Text>
+        <Text style={styles.label}>Telefon raqamingiz</Text>
+        <TextInput
+          style={styles.input}
+          keyboardType="phone-pad"
+          value={phone}
+          onChangeText={setPhone}
+        />
+
+        <Text style={[styles.label, { marginTop: 12 }]}>Xabar</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          multiline
+          placeholder="Taklif yoki shikoyatingiz..."
+          value={message}
+          onChangeText={setMessage}
+          textAlignVertical="top"
+        />
+
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleFeedbackSubmit}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>
+            {loading ? "Yuborilmoqda..." : "Yuborish"}
+          </Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+  },
+  content: {
+    padding: 16,
+    paddingTop: 60,
+  },
+  header: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 24,
+  },
+  section: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    color: "#2E7D32",
+    marginBottom: 16,
+  },
+  row: {
+    flexDirection: "row",
+    gap: 16,
+  },
+  inputGroup: {
+    flex: 1,
+  },
+  label: {
+    fontSize: 14,
+    color: "#666",
+    marginBottom: 6,
+  },
+  input: {
+    backgroundColor: "#F9F9F9",
+    borderWidth: 1,
+    borderColor: "#EEE",
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 16,
+    color: "#333",
+  },
+  textArea: {
+    height: 100,
+  },
+  button: {
+    backgroundColor: "#2E7D32",
+    borderRadius: 12,
+    padding: 16,
+    alignItems: "center",
+    marginTop: 16,
+  },
+  buttonDisabled: {
+    opacity: 0.7,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+});
