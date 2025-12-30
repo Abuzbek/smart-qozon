@@ -2,6 +2,7 @@ import { IngredientSelector } from "@/components/IngredientSelector";
 import { Recipe, ResultCard } from "@/components/ResultCard";
 import { Colors } from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
+import { useUserStore } from "@/store/userStore";
 import { ArrowLeft, ChefHat, RotateCcw } from "lucide-react-native";
 import React, { useState } from "react";
 import {
@@ -62,6 +63,7 @@ export default function HomeScreen() {
 
     setLoading(true);
     try {
+      const familyProfile = useUserStore.getState().family;
       // Mock logic for daily limit: allow always
 
       // Call Supabase Edge Function
@@ -70,7 +72,10 @@ export default function HomeScreen() {
         {
           body: {
             ingredients: selectedIngredients,
-            familyConfig: { adults: 2, children: 3 }, // Mocked for now, or fetch from storage
+            familyConfig: {
+              adults: familyProfile?.adults || 2,
+              children: familyProfile?.children || 2,
+            },
           },
         }
       );

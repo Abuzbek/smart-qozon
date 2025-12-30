@@ -41,7 +41,7 @@ export const syncUserDevice = async (phoneNumber: string | null = null) => {
       // console.log("User Synced:", modelName);
     }
 
-    return deviceId; 
+    return { deviceId, modelName };
   } catch (e) {
     console.error("Sync Failed:", e);
     return null;
