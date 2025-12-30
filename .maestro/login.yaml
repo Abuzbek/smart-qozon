@@ -2,11 +2,12 @@ appId: com.abuzcoder.smartqozon
 ---
 - launchApp:
     clearState: true
-- assertVisible: "Smart Qozon"
+- assertVisible: "Aqlli Qozon"
 - assertVisible: "Davom etish uchun telefon raqamingizni kiriting"
 - tapOn:
     id: "phone-input" 
-    # Note: We need to ensure the TextInput has testID="phone-input"
 - inputText: "+998901234567"
+- tapOn: "Keyingi qadam"
+- assertVisible: "Oilangiz haqida ma'lumot bering"
 - tapOn: "Kirish"
-- assertVisible: "Tarkiblar" # Assuming "Tarkiblar" is visible on the home screen
+- assertVisible: "Smart Qozon" 

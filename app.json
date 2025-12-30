@@ -52,6 +52,12 @@
         "projectId": "7feb50d6-90da-4a9b-8887-db85d2efb70b"
       }
     },
-    "owner": "abuzcoder"
+    "owner": "abuzcoder",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/7feb50d6-90da-4a9b-8887-db85d2efb70b"
+    }
   }
 }

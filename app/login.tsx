@@ -1,8 +1,8 @@
 import { Colors } from "@/constants/Colors";
-import { storage } from "@/lib/supabase"; // Access MMKV
 import { syncUserDevice } from "@/lib/userSync";
+import { useUserStore } from "@/store/userStore";
 import { useRouter } from "expo-router";
-import { ChefHat } from "lucide-react-native";
+import { ChefHat, Minus, Plus } from "lucide-react-native";
 import { useState } from "react";
 import {
   Alert,
@@ -17,28 +17,45 @@ import {
 } from "react-native";
 
 export default function LoginScreen() {
+  const [step, setStep] = useState<1 | 2>(1);
   const [phone, setPhone] = useState("+998 ");
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(2);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = async () => {
+  const handleNextStep = () => {
     if (phone.length < 13) {
-      // Simple validation for +998...
       Alert.alert("Xatolik", "Iltimos, to'g'ri telefon raqam kiriting");
       return;
     }
+    setStep(2);
+  };
 
+  const handleLogin = async () => {
     setLoading(true);
     try {
       // Sync user to backend
-      await syncUserDevice(phone);
+      const result = await syncUserDevice(phone);
 
-      // Save locally marker that user is logged in
-      storage.set("is_logged_in", true);
-      storage.set("user_phone", phone);
+      if (result) {
+        // Update global store
+        useUserStore.getState().setUserData({
+          phone: phone,
+          deviceModel: result.modelName,
+          deviceId: result.deviceId,
+        });
 
-      // Go to home
-      router.replace("/(tabs)");
+        useUserStore.getState().setFamily({
+          adults,
+          children,
+        });
+
+        // Go to home
+        router.replace("/(tabs)");
+      } else {
+        throw new Error("Device sync failed");
+      }
     } catch (error) {
       console.error(error);
       Alert.alert("Xatolik", "Tizimga kirishda xatolik yuz berdi");
@@ -47,37 +64,75 @@ export default function LoginScreen() {
     }
   };
 
+  const Counter = ({
+    label,
+    value,
+    onChange,
+  }: {
+    label: string;
+    value: number;
+    onChange: (v: number) => void;
+  }) => (
+    <View style={styles.counterContainer}>
+      <Text style={styles.counterLabel}>{label}</Text>
+      <View style={styles.counterControls}>
+        <TouchableOpacity
+          onPress={() => onChange(Math.max(0, value - 1))}
+          style={styles.counterButton}
+        >
+          <Minus size={20} color={Colors.light.tint} />
+        </TouchableOpacity>
+        <Text style={styles.counterValue}>{value}</Text>
+        <TouchableOpacity
+          onPress={() => onChange(value + 1)}
+          style={styles.counterButton}
+        >
+          <Plus size={20} color={Colors.light.tint} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.content}>
         <View style={styles.iconContainer}>
           <ChefHat size={64} color={Colors.light.tint} />
         </View>
-        <Text style={styles.title}>Smart Qozon</Text>
+        <Text style={styles.title}>Aqlli Qozon</Text>
         <Text style={styles.subtitle}>
-          Davom etish uchun telefon raqamingizni kiriting
+          {step === 1
+            ? "Davom etish uchun telefon raqamingizni kiriting"
+            : "Oilangiz haqida ma'lumot bering"}
         </Text>
 
-        <View style={styles.inputContainer}>
-          <Text style={styles.label}>Telefon raqam</Text>
-          <TextInput
-            testID="phone-input"
-            style={styles.input}
-            keyboardType="phone-pad"
-            value={phone}
-            onChangeText={setPhone}
-            placeholder="+998 90 123 45 67"
-          />
-        </View>
+        {step === 1 ? (
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Telefon raqam</Text>
+            <TextInput
+              testID="phone-input"
+              style={styles.input}
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
+              placeholder="+998 90 123 45 67"
+            />
+          </View>
+        ) : (
+          <View style={styles.inputContainer}>
+            <Counter label="Kattalar" value={adults} onChange={setAdults} />
+            <Counter label="Bolalar" value={children} onChange={setChildren} />
+          </View>
+        )}
 
         <TouchableOpacity
           testID="login-button"
           style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
+          onPress={step === 1 ? handleNextStep : handleLogin}
           disabled={loading}
         >
           <Text style={styles.buttonText}>
-            {loading ? "Kirish..." : "Kirish"}
+            {loading ? "Kirish..." : step === 1 ? "Keyingi qadam" : "Kirish"}
           </Text>
         </TouchableOpacity>
       </View>
@@ -149,5 +204,41 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  counterContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+  },
+  counterLabel: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
+  },
+  counterControls: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
+  counterButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#F0F8FF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  counterValue: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#333",
+    minWidth: 24,
+    textAlign: "center",
   },
 });

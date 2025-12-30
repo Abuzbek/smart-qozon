@@ -1,5 +1,5 @@
-import { storage } from "@/lib/supabase";
 import { syncUserDevice } from "@/lib/userSync";
+import { useUserStore } from "@/store/userStore";
 import { SplashScreen, Stack, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
 
@@ -17,7 +17,7 @@ export default function RootLayout() {
         await syncUserDevice();
 
         // Checklist
-        const isLoggedIn = storage.getBoolean("is_logged_in");
+        const isLoggedIn = useUserStore.getState().isLoggedIn;
 
         if (!isLoggedIn) {
           // We need to wait a tick for navigation to be ready

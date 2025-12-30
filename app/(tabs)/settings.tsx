@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
+import { useUserStore } from "@/store/userStore";
 import * as Application from "expo-application";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Platform,
@@ -14,12 +15,20 @@ import {
 
 export default function SettingsScreen() {
   const [message, setMessage] = useState("");
-  const [phone, setPhone] = useState("+998 ");
+  const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(false);
 
   // Family Profile State (Mocked initially or local state)
-  const [adults, setAdults] = useState("2");
-  const [children, setChildren] = useState("2");
+  const [adults, setAdults] = useState("");
+  const [children, setChildren] = useState("");
+
+  useEffect(() => {
+    const userPhone = useUserStore.getState().userPhone;
+    const familyProfile = useUserStore.getState().family;
+    setAdults(String(familyProfile?.adults) || "2");
+    setChildren(String(familyProfile?.children) || "2");
+    setPhone(userPhone || "+998 ");
+  }, []);
 
   const handleFeedbackSubmit = async () => {
     if (!message) {
