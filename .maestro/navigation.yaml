@@ -1,0 +1,9 @@
+appId: com.abuzcoder.smartqozon
+---
+- runFlow: login.yaml
+- tapOn: "Sevimlilar"
+- assertVisible: "Sevimlilar"
+- tapOn: "Sozlamalar"
+- assertVisible: "Sozlamalar"
+- tapOn: "Boridan Yo'q"
+- assertVisible: "Smart Qozon"

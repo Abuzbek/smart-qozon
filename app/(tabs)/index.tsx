@@ -144,7 +144,7 @@ export default function HomeScreen() {
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerTitleContainer}>
           <ChefHat size={32} color={Colors.light.tint} />
-          <Text style={styles.appTitle}>Aqlli Qozon</Text>
+          <Text style={styles.appTitle}>Smart Qozon</Text>
         </View>
 
         <Text style={styles.subtitle}>

@@ -53,7 +53,7 @@ export default function LoginScreen() {
         <View style={styles.iconContainer}>
           <ChefHat size={64} color={Colors.light.tint} />
         </View>
-        <Text style={styles.title}>Aqlli Qozon</Text>
+        <Text style={styles.title}>Smart Qozon</Text>
         <Text style={styles.subtitle}>
           Davom etish uchun telefon raqamingizni kiriting
         </Text>
@@ -61,6 +61,7 @@ export default function LoginScreen() {
         <View style={styles.inputContainer}>
           <Text style={styles.label}>Telefon raqam</Text>
           <TextInput
+            testID="phone-input"
             style={styles.input}
             keyboardType="phone-pad"
             value={phone}
@@ -70,6 +71,7 @@ export default function LoginScreen() {
         </View>
 
         <TouchableOpacity
+          testID="login-button"
           style={[styles.button, loading && styles.buttonDisabled]}
           onPress={handleLogin}
           disabled={loading}

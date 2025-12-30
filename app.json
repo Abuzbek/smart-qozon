@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "smart-kelin",
-    "slug": "smart-kelin",
+    "name": "smart-qozon",
+    "slug": "smart-qozon",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "smartkelin",
+    "scheme": "smartqozon",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.abuzcoder.smartkelin"
+      "bundleIdentifier": "com.abuzcoder.smartqozon"
     },
     "android": {
       "adaptiveIcon": {
@@ -21,7 +21,7 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.abuzcoder.smartkelin"
+      "package": "com.abuzcoder.smartqozon"
     },
     "web": {
       "output": "static",
@@ -45,6 +45,13 @@
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "7feb50d6-90da-4a9b-8887-db85d2efb70b"
+      }
+    },
+    "owner": "abuzcoder"
   }
 }

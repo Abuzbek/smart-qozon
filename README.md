@@ -1,4 +1,4 @@
-# Smart Qozon (Aqlli Qozon)
+# Smart Qozon (Smart Qozon)
 
 Smart Qozon is a smart cooking assistant mobile application built with React Native and Expo. It helps users discover recipes based on available ingredients, utilizing AI generation features powered by Supabase Edge Functions.
 
@@ -29,24 +29,28 @@ Smart Qozon is a smart cooking assistant mobile application built with React Nat
 ### Installation
 
 1. **Clone the repository**
+
    ```bash
    git clone https://github.com/Abuzbek/smart-qozon.git
-   cd smart-kelin
+   cd smart-qozon
    ```
 
 2. **Install dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Environment Setup**
    Create a `.env` file in the root directory with your Supabase credentials:
+
    ```env
    EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
    EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    ```
 
 4. **Run the Project**
+
    ```bash
    npx expo start
    ```
@@ -60,6 +64,31 @@ Smart Qozon is a smart cooking assistant mobile application built with React Nat
 - `lib/`: Utility libraries (Supabase client, User sync logic).
 - `constants/`: App constants (Colors, Theme).
 - `supabase/`: Supabase configuration and Edge Functions.
+
+## 🧪 E2E Testing
+
+We use [Maestro](https://maestro.mobile.dev/) for End-to-End testing.
+
+### Running Tests Locally
+
+1. Install Maestro CLI:
+
+   ```bash
+   curl -Ls "https://get.maestro.mobile.dev" | bash
+   ```
+
+2. Start your iOS Simulator or Android Emulator and install the app (development build).
+3. Run the login flow:
+
+   ```bash
+   maestro test .maestro/login.yaml
+   ```
+
+4. Run the full navigation flow:
+
+   ```bash
+   maestro test .maestro/navigation.yaml
+   ```
 
 ## 🤝 Contributing
 
