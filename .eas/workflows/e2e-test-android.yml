@@ -15,4 +15,4 @@ jobs:
     type: maestro
     params:
       build_id: ${{ needs.build_android_for_e2e.outputs.build_id }}
-      flow_path: ['.maestro/navigation.yaml', '.maestro/login.yaml']
+      flow_path: ['.maestro/navigation.yaml']

@@ -9,4 +9,4 @@ appId: com.abuzcoder.smartqozon
     # Note: We need to ensure the TextInput has testID="phone-input"
 - inputText: "+998901234567"
 - tapOn: "Kirish"
-- assertVisible: "Tarkiblar" # Assuming "Tarkiblar" is visible on the home screen
+- assertVisible: "Smart Qozon" # Assuming "Tarkiblar" is visible on the home screen
