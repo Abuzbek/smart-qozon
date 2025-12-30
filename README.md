@@ -1,50 +1,70 @@
-# Welcome to your Expo app 👋
+# Smart Qozon (Aqlli Qozon)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Smart Qozon is a smart cooking assistant mobile application built with React Native and Expo. It helps users discover recipes based on available ingredients, utilizing AI generation features powered by Supabase Edge Functions.
 
-## Get started
+## 🚀 Features
 
-1. Install dependencies
+- **Smart Recipe Generation**: Suggests recipes based on ingredients you have.
+- **User Synchronization**: Seamless login and device synchronization using phone numbers.
+- **Favorites**: Save your favorite recipes for quick access.
+- **Modern UI/UX**: Built with a clean, responsive design using custom components.
 
+## 🛠 Tech Stack
+
+- **Frontend**: React Native, Expo, TypeScript
+- **Navigation**: Expo Router
+- **Backend**: Supabase (Database, Edge Functions)
+- **Storage**: MMKV (High-performance local storage)
+- **State Management**: Zustand (implied/planned) / Local State
+- **Device Info**: `expo-device` for unique device tracking
+
+## 🏁 Getting Started
+
+### Prerequisites
+
+- Node.js (LTS recommended)
+- npm or yarn
+- Expo Go app on your physical device or an Android/iOS emulator
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Abuzbek/smart-qozon.git
+   cd smart-kelin
+   ```
+
+2. **Install dependencies**
    ```bash
    npm install
    ```
 
-2. Start the app
+3. **Environment Setup**
+   Create a `.env` file in the root directory with your Supabase credentials:
+   ```env
+   EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+   EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
 
+4. **Run the Project**
    ```bash
    npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+## 📱 Project Structure
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+- `app/`: Expo Router pages and layouts.
+  - `(tabs)/`: Main application tabs (Home, Favorites, Settings).
+  - `login.tsx`: Authentication screen.
+- `components/`: Reusable UI components (IngredientSelector, ResultCard, etc.).
+- `lib/`: Utility libraries (Supabase client, User sync logic).
+- `constants/`: App constants (Colors, Theme).
+- `supabase/`: Supabase configuration and Edge Functions.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🤝 Contributing
 
-## Get a fresh project
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-When you're ready, run:
+## 📄 License
 
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+[MIT](LICENSE)
