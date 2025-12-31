@@ -30,7 +30,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/ios-light.png",
+          "image": "./assets/images/transparent_logo.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#F78938",
@@ -38,7 +38,23 @@
             "backgroundColor": "#F78938"
           }
         }
-      ]
+      ],
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-5204276505239413~6274888363",
+          "iosAppId": "ca-app-pub-5204276505239413~9228354769"
+        }
+      ],
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true,

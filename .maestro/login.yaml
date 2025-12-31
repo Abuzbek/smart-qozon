@@ -10,4 +10,4 @@ appId: com.abuzcoder.smartqozon
 - tapOn: "Keyingi qadam"
 - assertVisible: "Oilangiz haqida ma'lumot bering"
 - tapOn: "Kirish"
-- assertVisible: "Smart Qozon" 
+- assertVisible: "Pishir" 

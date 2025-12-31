@@ -1,26 +1,30 @@
-import { createClient } from "@supabase/supabase-js";
-import { AppState } from "react-native";
-import { createMMKV } from "react-native-mmkv";
-import "react-native-url-polyfill/auto";
+import { createClient } from '@supabase/supabase-js';
+import { MMKV } from 'react-native-mmkv';
+import 'react-native-url-polyfill/auto';
 
-export const storage = createMMKV({
-  id: `user-storage`,
-  mode: "multi-process",
-  readOnly: false,
-});
+// Initialize MMKV
+export const storage = new MMKV();
 
-const mmkvAdapter = {
+// ⬇️ ADD THIS: Define the SSR-safe storage adapter
+export const mmkvAdapter = {
   getItem: (key: string) => {
+    // If we are on the server (EAS build/Next.js), return null immediately
+    if (typeof window === 'undefined') return null;
+    
     const value = storage.getString(key);
-    return Promise.resolve(value ?? null);
+    return value === undefined ? null : value;
   },
   setItem: (key: string, value: string) => {
+    // If we are on the server, do nothing
+    if (typeof window === 'undefined') return;
+    
     storage.set(key, value);
-    return Promise.resolve();
   },
   removeItem: (key: string) => {
-    storage.remove(key);
-    return Promise.resolve();
+    // If we are on the server, do nothing
+    if (typeof window === 'undefined') return;
+    
+    storage.delete(key);
   },
 };
 
@@ -29,22 +33,9 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || "";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
-    storage: mmkvAdapter,
+    storage: mmkvAdapter, // ⬅️ USE THE SAFE ADAPTER HERE
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
   },
-});
-
-// Tells Supabase Auth to continuously refresh the session automatically
-// if the app is in the foreground. When this is added, you will continue
-// to receive `onAuthStateChange` events with the `TOKEN_REFRESHED` or
-// `SIGNED_OUT` event if the user's session is terminated. This should
-// only be registered once.
-AppState.addEventListener("change", (state) => {
-  if (state === "active") {
-    supabase.auth.startAutoRefresh();
-  } else {
-    supabase.auth.stopAutoRefresh();
-  }
 });

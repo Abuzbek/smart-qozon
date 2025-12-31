@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Heart, Chrome as Home, Settings } from "lucide-react-native";
+import { Heart, Home, Settings } from "lucide-react-native";
 import React from "react";
 
 import { Colors } from "@/constants/Colors";
@@ -11,10 +11,14 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        tabBarActiveTintColor: "#000",
+        tabBarInactiveTintColor: Colors[colorScheme ?? "light"].text,
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: colorScheme === "dark" ? "#000" : "#fff",
+          backgroundColor:
+            colorScheme === "dark"
+              ? Colors.light.primary
+              : Colors.light.background,
           borderTopWidth: 0,
           elevation: 5,
           shadowColor: "#000",

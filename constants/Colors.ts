@@ -1,6 +1,3 @@
-const tintColorLight = "#2E7D32";
-const tintColorDark = "#fff";
-
 export const Colors = {
   light: {
     text: "#402C1C",
@@ -12,6 +9,8 @@ export const Colors = {
     primary: "#F78938",
     primaryDisabled: "rgba(247, 136, 56, 0.5)",
     secondary: "#E63639",
+    black: '#000',
+    white: '#fff'
   },
   dark: {
     // For MVP, we might want to stick to the light theme primarily as requested
