@@ -107,7 +107,6 @@ export default function SettingsScreen() {
         <TextInput
           style={[styles.input, styles.textArea]}
           multiline
-          placeholder="Taklif yoki shikoyatingiz..."
           value={message}
           onChangeText={setMessage}
           textAlignVertical="top"
@@ -166,7 +165,7 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: Colors.light.white,
     borderWidth: 1,
     borderColor: "#EEE", // Consider updating if needed, else keep neutral
     borderRadius: 8,

@@ -6,4 +6,4 @@ appId: com.abuzcoder.smartqozon
 - tapOn: "Sozlamalar"
 - assertVisible: "Sozlamalar"
 - tapOn: "Boridan Yo'q"
-- assertVisible: "Smart Qozon"
+- assertVisible: "Pishir"

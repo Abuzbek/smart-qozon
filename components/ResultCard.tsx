@@ -1,163 +1,184 @@
 import { Colors } from "@/constants/Colors";
-import { Clock } from "lucide-react-native";
+import { Recipe } from "@/store/recipeStore";
+import { Clock, Flame, Globe } from "lucide-react-native";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
-
-export interface Recipe {
-  name_uz: string;
-  cooking_time: string;
-  description: string;
-  ingredients: { name: string; amount: string }[];
-  steps: string[];
-  servings?: string;
-}
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface ResultCardProps {
   recipe: Recipe;
+  onPress: () => void;
 }
 
-export function ResultCard({ recipe }: ResultCardProps) {
+const DifficultyBadge = ({ level }: { level: string }) => {
+  const color =
+    level === "1" || level === "2"
+      ? "#4CAF50"
+      : level === "3"
+      ? "#FFC107"
+      : "#F44336";
   return (
-    <View style={styles.card}>
-      <Text style={styles.title}>{recipe.name_uz}</Text>
+    <View style={[styles.badge, { backgroundColor: color + "20" }]}>
+      <Text style={[styles.badgeText, { color }]}>
+        {level === "1" || level === "2"
+          ? "Oson"
+          : level === "3"
+          ? "O'rta"
+          : "Qiyin"}
+      </Text>
+    </View>
+  );
+};
 
-      <View style={styles.metaRow}>
+export function ResultCard({ recipe, onPress }: ResultCardProps) {
+  const matchColor =
+    recipe?.match_rate && recipe?.match_rate >= 80
+      ? "#4CAF50"
+      : recipe?.match_rate && recipe?.match_rate >= 50
+      ? "#FFC107"
+      : "#F44336";
+
+  return (
+    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+      <View style={styles.headerRow}>
+        <View style={styles.matchContainer}>
+          <Text style={[styles.matchScore, { color: matchColor }]}>
+            {recipe.match_rate}%
+          </Text>
+          <Text style={styles.matchLabel}>Moslik</Text>
+        </View>
+        <View style={{ flex: 1, paddingHorizontal: 10 }}>
+          <Text style={styles.title} numberOfLines={2}>
+            {recipe.name_uz}
+          </Text>
+          <Text style={styles.subtitle}>{recipe.name_original}</Text>
+        </View>
+      </View>
+
+      <View style={styles.divider} />
+
+      <View style={styles.metaGrid}>
         <View style={styles.metaItem}>
           <Clock size={16} color={Colors.light.text} />
           <Text style={styles.metaText}>{recipe.cooking_time}</Text>
         </View>
+        <View style={styles.metaItem}>
+          <Flame size={16} color={Colors.light.primary} />
+          <Text style={styles.metaText}>{recipe.calories}</Text>
+        </View>
+        <View style={styles.metaItem}>
+          <Globe size={16} color={Colors.light.tint} />
+          <Text style={styles.metaText}>{recipe.cuisine_type}</Text>
+        </View>
+        <DifficultyBadge level={recipe?.difficulty || "1"} />
       </View>
 
-      <Text style={styles.description}>{recipe.description}</Text>
-
-      <View style={styles.divider} />
-
-      <Text style={styles.sectionTitle}>Kerakli masalliqlar:</Text>
-      {recipe.ingredients.map((ing, idx) => (
-        <View key={idx} style={styles.ingredientRow}>
-          <Text style={styles.bullet}>•</Text>
-          <Text style={styles.ingredientName}>{ing.name}</Text>
-          <Text style={styles.ingredientAmount}>{ing.amount}</Text>
-        </View>
-      ))}
-
-      <View style={styles.divider} />
-
-      <Text style={styles.sectionTitle}>Tayyorlanishi:</Text>
-      {recipe.steps.map((step, idx) => (
-        <View key={idx} style={styles.stepRow}>
-          <View style={styles.stepNumberContainer}>
-            <Text style={styles.stepNumber}>{idx + 1}</Text>
+      {recipe?.missing_ingredients &&
+        recipe?.missing_ingredients?.length > 0 && (
+          <View style={styles.missingContainer}>
+            <Text style={styles.missingLabel}>Yetishmovchilik:</Text>
+            <Text style={styles.missingText} numberOfLines={1}>
+              {recipe.missing_ingredients.join(", ")}
+            </Text>
           </View>
-          <Text style={styles.stepText}>{step}</Text>
-        </View>
-      ))}
-    </View>
+        )}
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.light.background,
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 16,
     width: "100%",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    marginBottom: 30,
+    shadowRadius: 10,
+    elevation: 4,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: "#F0F0F0",
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  matchContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#F8F9FA",
+    padding: 10,
+    borderRadius: 14,
+    minWidth: 60,
+  },
+  matchScore: {
+    fontSize: 18,
+    fontFamily: "Fredoka_Bold",
+  },
+  matchLabel: {
+    fontSize: 10,
+    fontFamily: "Fredoka_Regular",
+    color: "#888",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontSize: 18,
+    fontFamily: "Fredoka_Bold",
     color: Colors.light.text,
-    marginBottom: 12,
-    textAlign: "center",
   },
-  metaRow: {
+  subtitle: {
+    fontSize: 12,
+    fontFamily: "Fredoka_Regular",
+    color: "#888",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#F0F0F0",
+    marginVertical: 12,
+  },
+  metaGrid: {
     flexDirection: "row",
-    justifyContent: "center",
-    gap: 16,
-    marginBottom: 16,
+    justifyContent: "space-between",
+    flexWrap: "wrap",
+    alignItems: "center",
+    marginBottom: 12,
   },
   metaItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    backgroundColor: Colors.light.background,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    gap: 4,
   },
   metaText: {
+    fontSize: 13,
+    fontFamily: "Fredoka_Medium",
     color: Colors.light.text,
-    fontSize: 14,
-    fontWeight: "500",
   },
-  description: {
-    fontSize: 16,
-    color: "#555", // Maybe update to text color?
-    textAlign: "center",
-    marginBottom: 20,
-    fontStyle: "italic",
-    lineHeight: 22,
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  divider: {
-    height: 1,
-    backgroundColor: "#EEE",
-    marginVertical: 16,
+  badgeText: {
+    fontSize: 12,
+    fontFamily: "Fredoka_Bold",
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: Colors.light.primary,
-    marginBottom: 12,
-  },
-  ingredientRow: {
+  missingContainer: {
+    backgroundColor: "#FFF4E5",
+    padding: 10,
+    borderRadius: 12,
     flexDirection: "row",
-    marginBottom: 8,
     alignItems: "center",
+    gap: 6,
   },
-  bullet: {
-    color: Colors.light.primary,
-    fontSize: 18,
-    marginRight: 8,
+  missingLabel: {
+    fontSize: 12,
+    fontFamily: "Fredoka_Bold",
+    color: "#FF9800",
   },
-  ingredientName: {
-    fontSize: 16,
-    color: Colors.light.text,
+  missingText: {
+    fontSize: 12,
+    fontFamily: "Fredoka_Regular",
+    color: "#663C00",
     flex: 1,
-  },
-  ingredientAmount: {
-    fontSize: 16,
-    color: Colors.light.text,
-    fontWeight: "500",
-  },
-  stepRow: {
-    flexDirection: "row",
-    marginBottom: 16,
-  },
-  stepNumberContainer: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.light.primary,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-    marginTop: 2,
-  },
-  stepNumber: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 14,
-  },
-  stepText: {
-    flex: 1,
-    fontSize: 16,
-    color: Colors.light.text,
-    lineHeight: 24,
   },
 });

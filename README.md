@@ -1,6 +1,6 @@
-# Smart Qozon (Smart Qozon)
+# Pishir (Pishir)
 
-Smart Qozon is a smart cooking assistant mobile application built with React Native and Expo. It helps users discover recipes based on available ingredients, utilizing AI generation features powered by Supabase Edge Functions.
+Pishir is a smart cooking assistant mobile application built with React Native and Expo. It helps users discover recipes based on available ingredients, utilizing AI generation features powered by Supabase Edge Functions.
 
 ## 🚀 Features
 

@@ -1,16 +1,20 @@
+import transparentLogo from "@/assets/images/transparent_logo.png";
+import { AdBanner } from "@/components/AdBanner";
 import { IngredientSelector } from "@/components/IngredientSelector";
-import { Recipe, ResultCard } from "@/components/ResultCard";
+import { RecipeDetails } from "@/components/RecipeDetails";
+import { ResultCard } from "@/components/ResultCard";
 import { Colors } from "@/constants/Colors";
 import { supabase } from "@/lib/supabase";
+import { useIngredientsStore } from "@/store/ingredientsStore";
+import { Recipe, useRecipeStore } from "@/store/recipeStore";
 import { useUserStore } from "@/store/userStore";
+import { Image } from "expo-image";
 import { ArrowLeft, ChefHat, RotateCcw } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Platform,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   TouchableOpacity,
@@ -20,17 +24,20 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 const MOCK_RECIPE: Recipe[] = [
   {
+    name_original: "Potato and Egg Fry",
     name_uz: "Tuxum va Kartoshkali Qovurma",
+    match_rate: 100,
+    difficulty: "1",
     cooking_time: "25 daqiqa",
-    description:
-      "Tez va to'yimli nonushta yoki kechki ovqat uchun ajoyib tanlov. Bor masalliqlar bilan oson tayyorlanadi.",
+    cuisine_type: "O'zbek",
+    calories: "350 kkal",
     ingredients: [
       { name: "Kartoshka", amount: "3 dona" },
       { name: "Tuxum", amount: "4 dona" },
       { name: "Piyoz", amount: "1 dona" },
       { name: "Yog'", amount: "50 ml" },
-      { name: "Tuz", amount: "ta'bga ko'ra" },
     ],
+    missing_ingredients: [],
     steps: [
       "Kartoshkani tozalab, mayda kubik shaklida to'g'rang.",
       "Piyozni yarim halqa qilib to'g'rang.",
@@ -45,7 +52,13 @@ const MOCK_RECIPE: Recipe[] = [
 export default function HomeScreen() {
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [recipes, setRecipes] = useState<Recipe[] | null>(null);
+
+  // Local state for current search results
+  const [currentRecipes, setCurrentRecipes] = useState<Recipe[] | null>(null);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+
+  const { loading: isSyncing } = useIngredientsStore();
+  const { addRecentRecipes } = useRecipeStore();
 
   const toggleIngredient = (ing: string) => {
     if (selectedIngredients.includes(ing)) {
@@ -64,7 +77,6 @@ export default function HomeScreen() {
     setLoading(true);
     try {
       const familyProfile = useUserStore.getState().family;
-      // Mock logic for daily limit: allow always
 
       // Call Supabase Edge Function
       const { data, error } = await supabase.functions.invoke(
@@ -80,34 +92,43 @@ export default function HomeScreen() {
         }
       );
 
+      console.log("Edge function response:", data);
+
       if (error) {
         console.warn("Edge function error, falling back to mock:", error);
-        // Fallback to mock for MVP if backend isn't ready
         setTimeout(() => {
-          setRecipes(MOCK_RECIPE);
+          setCurrentRecipes(MOCK_RECIPE);
+          addRecentRecipes(MOCK_RECIPE);
           setLoading(false);
         }, 2000);
       } else {
         console.log("Edge function success:", data);
-        setRecipes(data);
+        if (Array.isArray(data)) {
+          const newRecipes = data as Recipe[];
+          setCurrentRecipes(newRecipes);
+          addRecentRecipes(newRecipes);
+        } else {
+          console.warn("Expected array but got:", data);
+          setCurrentRecipes([]);
+        }
         setLoading(false);
       }
     } catch (e) {
       console.error(e);
-      // Fallback
       setTimeout(() => {
-        setRecipes(MOCK_RECIPE);
+        setCurrentRecipes(MOCK_RECIPE);
+        addRecentRecipes(MOCK_RECIPE);
         setLoading(false);
       }, 2000);
     }
   };
 
   const reset = () => {
-    setRecipes(null);
-    setSelectedIngredients([]);
+    setCurrentRecipes(null);
+    setSelectedRecipe(null);
   };
 
-  if (loading) {
+  if (loading || isSyncing) {
     return (
       <SafeAreaView style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={Colors.light.tint} />
@@ -119,37 +140,62 @@ export default function HomeScreen() {
     );
   }
 
-  if (recipes && recipes.length > 0) {
+  // Show Details View
+  if (selectedRecipe) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <RecipeDetails
+          recipe={selectedRecipe}
+          onBack={() => setSelectedRecipe(null)}
+        />
+      </SafeAreaView>
+    );
+  }
+
+  // Show Results List
+  if (currentRecipes && currentRecipes.length > 0) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => setRecipes(null)}
-            style={styles.iconButton}
-          >
+          <TouchableOpacity onPress={reset} style={styles.iconButton}>
             <ArrowLeft size={24} color={Colors.light.text} />
             <Text style={styles.backText}>Orqaga</Text>
           </TouchableOpacity>
         </View>
         <ScrollView contentContainerStyle={styles.resultScroll}>
-          {recipes.map((recipe, index) => (
-            <ResultCard key={index} recipe={recipe} />
+          <Text style={styles.resultTitle}>Topilgan Retseptlar</Text>
+          {currentRecipes.map((recipe, index) => (
+            <ResultCard
+              key={index}
+              recipe={recipe}
+              onPress={() => setSelectedRecipe(recipe)}
+            />
           ))}
-          <TouchableOpacity style={styles.resetButton} onPress={reset}>
+          <TouchableOpacity
+            style={styles.resetButton}
+            onPress={handleFindRecipe}
+          >
             <RotateCcw size={20} color={Colors.light.background} />
-            <Text style={styles.resetButtonText}>Boshqasini izlash</Text>
+            <Text style={styles.resetButtonText}>Qayta izlash</Text>
           </TouchableOpacity>
         </ScrollView>
+        <View style={{ position: "absolute", bottom: 0, width: "100%" }}>
+          <AdBanner />
+        </View>
       </SafeAreaView>
     );
   }
 
+  // Default Search View
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.headerTitleContainer}>
-          <ChefHat size={32} color={Colors.light.tint} />
-          <Text style={styles.appTitle}>Smart Qozon</Text>
+          <Image
+            source={transparentLogo}
+            style={styles.logo}
+            contentFit="contain"
+          />
         </View>
 
         <Text style={styles.subtitle}>
@@ -193,7 +239,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: Colors.light.background,
-    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   loadingContainer: {
     flex: 1,
@@ -204,17 +249,17 @@ const styles = StyleSheet.create({
   loadingText: {
     marginTop: 20,
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Fredoka_Bold",
     color: Colors.light.tint,
   },
   loadingSubText: {
     marginTop: 8,
     fontSize: 14,
+    fontFamily: "Fredoka_Regular",
     color: Colors.light.text,
   },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100,
   },
   header: {
     paddingHorizontal: 20,
@@ -223,19 +268,18 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerTitleContainer: {
-    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
+    height: 150,
     marginBottom: 24,
     gap: 10,
   },
-  appTitle: {
-    fontSize: 28,
-    fontWeight: "bold",
-    color: Colors.light.text,
+  logo: {
+    width: "100%",
+    height: "100%",
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: "Fredoka_Regular",
     color: Colors.light.text,
     textAlign: "center",
     marginBottom: 30,
@@ -254,7 +298,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 16,
-    borderRadius: 16,
+    borderRadius: 100,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.2,
@@ -268,7 +312,7 @@ const styles = StyleSheet.create({
   fabText: {
     color: Colors.light.background,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Fredoka_Bold",
   },
   iconButton: {
     flexDirection: "row",
@@ -279,11 +323,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.light.text,
     marginLeft: 4,
-    fontWeight: "500",
+    fontFamily: "Fredoka_Medium",
   },
   resultScroll: {
     padding: 20,
     paddingBottom: 40,
+  },
+  resultTitle: {
+    fontSize: 22,
+    fontFamily: "Fredoka_Bold",
+    color: Colors.light.text,
+    marginBottom: 20,
+    textAlign: "center",
   },
   resetButton: {
     flexDirection: "row",
@@ -293,11 +344,11 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 8,
-    marginTop: -10,
+    marginTop: 20,
   },
   resetButtonText: {
     color: Colors.light.background,
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "Fredoka_Bold",
   },
 });

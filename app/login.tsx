@@ -1,20 +1,25 @@
+import transparentLogo from "@/assets/images/transparent_logo.png";
+import { Input } from "@/components/Input";
 import { Colors } from "@/constants/Colors";
 import { syncUserDevice } from "@/lib/userSync";
 import { useUserStore } from "@/store/userStore";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
-import { ChefHat, Minus, Plus } from "lucide-react-native";
+import { Minus, Plus } from "lucide-react-native";
 import { useState } from "react";
 import {
   Alert,
+  Keyboard,
   Platform,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
+  TouchableWithoutFeedback,
   View,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function LoginScreen() {
   const [step, setStep] = useState<1 | 2>(1);
@@ -50,7 +55,6 @@ export default function LoginScreen() {
           adults,
           children,
         });
-
         // Go to home
         router.replace("/(tabs)");
       } else {
@@ -58,7 +62,10 @@ export default function LoginScreen() {
       }
     } catch (error) {
       console.error(error);
-      Alert.alert("Xatolik", "Tizimga kirishda xatolik yuz berdi");
+      Alert.alert(
+        "Xatolik",
+        "Tizimga kirishda xatolik yuz berdi" + JSON.stringify(error)
+      );
     } finally {
       setLoading(false);
     }
@@ -95,47 +102,58 @@ export default function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <ChefHat size={64} color={Colors.light.tint} />
-        </View>
-        <Text style={styles.title}>Aqlli Qozon</Text>
-        <Text style={styles.subtitle}>
-          {step === 1
-            ? "Davom etish uchun telefon raqamingizni kiriting"
-            : "Oilangiz haqida ma'lumot bering"}
-        </Text>
-
-        {step === 1 ? (
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Telefon raqam</Text>
-            <TextInput
-              testID="phone-input"
-              style={styles.input}
-              keyboardType="phone-pad"
-              value={phone}
-              onChangeText={setPhone}
-              placeholder="+998 90 123 45 67"
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={[styles.content]}
+          keyboardVerticalOffset={0}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        >
+          <View style={styles.logo_container}>
+            <Image
+              source={transparentLogo}
+              style={styles.logo}
+              contentFit="contain"
             />
           </View>
-        ) : (
-          <View style={styles.inputContainer}>
-            <Counter label="Kattalar" value={adults} onChange={setAdults} />
-            <Counter label="Bolalar" value={children} onChange={setChildren} />
-          </View>
-        )}
-
-        <TouchableOpacity
-          testID="login-button"
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={step === 1 ? handleNextStep : handleLogin}
-          disabled={loading}
-        >
-          <Text style={styles.buttonText}>
-            {loading ? "Kirish..." : step === 1 ? "Keyingi qadam" : "Kirish"}
+          <Text style={styles.subtitle}>
+            {step === 1
+              ? "Davom etish uchun telefon raqamingizni kiriting"
+              : "Oilangiz haqida ma'lumot bering"}
           </Text>
-        </TouchableOpacity>
-      </View>
+
+          {step === 1 ? (
+            <View style={styles.inputContainer}>
+              <Input
+                testID="phone-input"
+                keyboardType="phone-pad"
+                value={phone}
+                onChangeText={setPhone}
+                label="Telefon raqam"
+              />
+            </View>
+          ) : (
+            <View style={styles.inputContainer}>
+              <Counter label="Kattalar" value={adults} onChange={setAdults} />
+              <Counter
+                label="Bolalar"
+                value={children}
+                onChange={setChildren}
+              />
+            </View>
+          )}
+
+          <TouchableOpacity
+            testID="login-button"
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={step === 1 ? handleNextStep : handleLogin}
+            disabled={loading}
+          >
+            <Text style={styles.buttonText}>
+              {loading ? "Kirish..." : step === 1 ? "Keyingi qadam" : "Kirish"}
+            </Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
+      </TouchableWithoutFeedback>
     </SafeAreaView>
   );
 }
@@ -151,20 +169,20 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: "center",
   },
-  iconContainer: {
+  logo_container: {
     alignItems: "center",
     marginBottom: 16,
+    height: 150,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: "bold",
-    color: Colors.light.text,
-    textAlign: "center",
-    marginBottom: 8,
+  logo: {
+    width: "100%",
+    objectFit: "contain",
+    height: "100%",
   },
   subtitle: {
     fontSize: 16,
     color: Colors.light.text,
+    fontFamily: "Fredoka_Medium",
     textAlign: "center",
     marginBottom: 40,
   },
@@ -188,7 +206,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: Colors.light.tint,
-    borderRadius: 12,
+    borderRadius: 100,
     paddingVertical: 16,
     alignItems: "center",
     shadowColor: Colors.light.tint,
@@ -203,7 +221,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: Colors.light.background,
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Fredoka_Bold",
   },
   counterContainer: {
     flexDirection: "row",
@@ -211,15 +229,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: Colors.light.background,
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 100,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: Colors.light.text,
   },
   counterLabel: {
     fontSize: 16,
     color: Colors.light.text,
-    fontWeight: "500",
+    fontFamily: "Fredoka_Medium",
   },
   counterControls: {
     flexDirection: "row",
@@ -236,7 +254,7 @@ const styles = StyleSheet.create({
   },
   counterValue: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontFamily: "Fredoka_Bold",
     color: Colors.light.text,
     minWidth: 24,
     textAlign: "center",

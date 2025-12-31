@@ -1,45 +1,42 @@
 import { Colors } from "@/constants/Colors";
-import React from "react";
+import { GroupedIngredients } from "@/services/IngredientsService";
+import { useIngredientsStore } from "@/store/ingredientsStore";
+import { Check, Plus, Search } from "lucide-react-native";
+import React, { useState } from "react";
 import {
+  ActivityIndicator,
   StyleSheet,
   Text,
-  TextInput,
   TouchableOpacity,
   View,
 } from "react-native";
+import { useDebounce } from "use-debounce";
+import { Input } from "./Input";
 
-const COMMON_INGREDIENTS = [
-  "Kartoshka",
-  "Piyoz",
-  "Sabzi",
-  "Go'sht",
-  "Guruch",
-  "Tuxum",
-  "Pomidor",
-  "Bodring",
-  "Un",
-  "Yog'",
-  "Sut",
-  "Qatiq",
-  "Makaron",
-  "Karam",
-  "Sarimsoq",
-  "Ko'katlar",
-  "Tovuq",
-  "Baliq",
-  "No'xat",
-  "Loviyasi",
-  "Mosh",
-  "Shakar",
-  "Tuz",
-  "Ziravorlar",
-  "Non",
-  "Saryog'",
-  "Pishloq",
-  "Kolbasa",
-  "Sosiska",
-  "Mayonez",
-];
+// Helper for Trigram Similarity (similar to pg_trgm)
+function getTrigrams(str: string): Set<string> {
+  const trigrams = new Set<string>();
+  const padded = "  " + str.toLowerCase() + "  ";
+  for (let i = 0; i < padded.length - 2; i++) {
+    trigrams.add(padded.substring(i, i + 3));
+  }
+  return trigrams;
+}
+
+function calculateSimilarity(str1: string, str2: string): number {
+  if (!str1 || !str2) return 0;
+  const t1 = getTrigrams(str1);
+  const t2 = getTrigrams(str2);
+
+  if (t1.size === 0 || t2.size === 0) return 0;
+
+  let intersection = 0;
+  t1.forEach((gram) => {
+    if (t2.has(gram)) intersection++;
+  });
+
+  return (2 * intersection) / (t1.size + t2.size);
+}
 
 interface IngredientSelectorProps {
   selectedIngredients: string[];
@@ -50,45 +47,108 @@ export function IngredientSelector({
   selectedIngredients,
   onToggle,
 }: IngredientSelectorProps) {
-  const [searchQuery, setSearchQuery] = React.useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  // Debounce search query by 300ms
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const { ingredients, loading } = useIngredientsStore();
 
-  const filteredIngredients = COMMON_INGREDIENTS.filter((ing) =>
-    ing.toLowerCase().includes(searchQuery.toLowerCase())
+  const renderCheckbox = (isSelected: boolean) => (
+    <View style={[styles.checkbox, isSelected && styles.checkboxSelected]}>
+      {isSelected && <Check size={12} color={Colors.light.background} />}
+    </View>
   );
+
+  const filteredGroups = React.useMemo(() => {
+    const grouped: GroupedIngredients = {};
+    if (!ingredients || !Array.isArray(ingredients)) return grouped;
+
+    // Group all ingredients first if no search
+    if (!debouncedSearchQuery) {
+      ingredients.forEach((ing) => {
+        const catKey = String(ing.category_uz || "Boshqa");
+        if (!grouped[catKey]) grouped[catKey] = [];
+        grouped[catKey].push(ing);
+      });
+      return grouped;
+    }
+
+    // Fuzzy Search Filter
+    ingredients.forEach((ing) => {
+      const name = ing.name_uz || ing.name || "";
+      // Calculate match
+      const similarity = calculateSimilarity(name, debouncedSearchQuery);
+
+      // Threshold > 0.2 (adjustable) or includes check
+      // Also check if category matches the search query
+      const catKey = String(ing.category_uz || "Boshqa");
+
+      if (
+        similarity >= 0.2 ||
+        name.toLowerCase().includes(debouncedSearchQuery.toLowerCase()) ||
+        catKey.toLowerCase().includes(debouncedSearchQuery.toLowerCase())
+      ) {
+        if (!grouped[catKey]) grouped[catKey] = [];
+        grouped[catKey].push(ing);
+      }
+    });
+
+    return grouped;
+  }, [ingredients, debouncedSearchQuery]);
+
+  if (loading) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator color={Colors.light.tint} />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Masalliqlar (kamida 3 ta tanlang):</Text>
-
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Masalliq qidirish..."
+        <Input
+          containerStyle={{ marginBottom: 8, flexGrow: 1 }}
+          placeholder="Masalliqlar izlash"
+          leftIcon={<Search size={20} color={Colors.light.text} />}
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholderTextColor={Colors.light.text}
         />
+        <TouchableOpacity style={styles.addButton}>
+          <Plus size={20} color={Colors.light.background} />
+          <Text style={styles.addButtonText}>Add Item</Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.grid}>
-        {filteredIngredients.map((ing) => {
-          const isSelected = selectedIngredients.includes(ing);
-          return (
-            <TouchableOpacity
-              key={ing}
-              style={[styles.chip, isSelected && styles.chipSelected]}
-              onPress={() => onToggle(ing)}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[styles.chipText, isSelected && styles.chipTextSelected]}
-              >
-                {ing}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
+      {Object.keys(filteredGroups).length === 0 ? (
+        <Text style={styles.emptyText}>Masalliqlar topilmadi</Text>
+      ) : (
+        <View style={styles.listContainer}>
+          {Object.entries(filteredGroups).map(([category, ingredients]) => (
+            <View key={category} style={styles.categorySection}>
+              <Text style={styles.categoryTitle}>{category}</Text>
+              <View style={styles.ingredientsList}>
+                {ingredients.map((ing) => {
+                  const displayName = ing.name_uz || ing.name;
+                  const isSelected = selectedIngredients.includes(displayName);
+
+                  return (
+                    <TouchableOpacity
+                      key={ing.id}
+                      style={styles.ingredientRow}
+                      onPress={() => onToggle(displayName)}
+                      activeOpacity={0.7}
+                    >
+                      {renderCheckbox(isSelected)}
+                      <Text style={styles.ingredientText}>{displayName}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
     </View>
   );
 }
@@ -97,54 +157,74 @@ const styles = StyleSheet.create({
   container: {
     marginBottom: 24,
   },
-  label: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.light.text,
-    marginBottom: 12,
-    marginLeft: 4,
+  loadingContainer: {
+    padding: 24,
+    alignItems: "center",
   },
   searchContainer: {
-    marginBottom: 16,
-  },
-  searchInput: {
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 12,
-    padding: 12,
-    fontSize: 16,
-    color: Colors.light.text,
-  },
-  grid: {
+    marginBottom: 24,
     flexDirection: "row",
-    flexWrap: "wrap",
     gap: 8,
+    alignItems: "flex-end", // Align input and button
   },
-  chip: {
+  addButton: {
+    backgroundColor: Colors.light.tint,
     paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: Colors.light.background,
-    borderRadius: 24,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    elevation: 1,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    height: 50, // Match typical input height
+    marginBottom: 8, // align with input bottom margin if any
   },
-  chipSelected: {
-    backgroundColor: Colors.light.primary,
-    borderColor: Colors.light.primary,
-  },
-  chipText: {
-    fontSize: 14,
-    color: Colors.light.text,
-    fontWeight: "500",
-  },
-  chipTextSelected: {
+  addButtonText: {
     color: Colors.light.background,
-    fontWeight: "600",
+    fontFamily: "Fredoka_Medium",
+    fontSize: 14,
+  },
+  listContainer: {
+    gap: 24,
+  },
+  categorySection: {
+    gap: 12,
+  },
+  categoryTitle: {
+    fontSize: 18,
+    fontFamily: "Fredoka_Bold",
+    color: Colors.light.text,
+    marginBottom: 4,
+  },
+  ingredientsList: {
+    gap: 12,
+  },
+  ingredientRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    borderWidth: 2,
+    borderColor: "#E0E0E0",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkboxSelected: {
+    backgroundColor: Colors.light.tint,
+    borderColor: Colors.light.tint,
+  },
+  ingredientText: {
+    fontSize: 16,
+    fontFamily: "Fredoka_Medium",
+    color: Colors.light.text,
+  },
+  emptyText: {
+    textAlign: "center",
+    color: Colors.light.text,
+    fontFamily: "Fredoka_Regular",
+    marginTop: 20,
   },
 });
