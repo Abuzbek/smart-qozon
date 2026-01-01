@@ -13,6 +13,7 @@ export interface Recipe {
   name_en?: string;
   name_ru?: string;
   match_rate?: number;
+  porsion?: string | number;
   difficulty?: string;
   cooking_time?: string;
   cuisine_type?: string;

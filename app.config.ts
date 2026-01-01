@@ -1,0 +1,78 @@
+import { ConfigContext, ExpoConfig } from "expo/config";
+export default ({ config }: ConfigContext): ExpoConfig => ({
+  ...config,
+  name: "smart-qozon",
+  slug: "smart-qozon",
+  version: "1.0.0",
+  orientation: "portrait",
+  icon: "./assets/images/ios-light.png",
+  scheme: "smartqozon",
+  userInterfaceStyle: "automatic",
+  newArchEnabled: true,
+  ios: {
+    supportsTablet: true,
+    bundleIdentifier: "com.abuzcoder.smartqozon",
+  },
+  android: {
+    adaptiveIcon: {
+      backgroundColor: "#F78938",
+      foregroundImage: "./assets/images/adaptive-icon.png",
+    },
+    edgeToEdgeEnabled: true,
+    predictiveBackGestureEnabled: false,
+    package: "com.abuzcoder.smartqozon",
+  },
+  web: {
+    // bundler: "metro",
+    output: "static",
+    favicon: "./assets/favicon.png",
+  },
+  plugins: [
+    "expo-router",
+    [
+      "expo-splash-screen",
+      {
+        image: "./assets/images/transparent_logo.png",
+        imageWidth: 200,
+        resizeMode: "contain",
+        backgroundColor: "#F78938",
+        dark: {
+          backgroundColor: "#F78938",
+        },
+      },
+    ],
+    [
+      "expo-build-properties",
+      {
+        ios: {
+          useFrameworks: "static",
+        },
+      },
+    ],
+    [
+      "react-native-google-mobile-ads",
+      {
+        androidAppId: "ca-app-pub-5204276505239413~6274888363",
+        iosAppId: "ca-app-pub-5204276505239413~9228354769",
+      },
+    ],
+    "expo-font",
+  ],
+  experiments: {
+    typedRoutes: true,
+    reactCompiler: true,
+  },
+  extra: {
+    router: {},
+    eas: {
+      projectId: "7feb50d6-90da-4a9b-8887-db85d2efb70b",
+    },
+  },
+  owner: "abuzcoder",
+  runtimeVersion: {
+    policy: "appVersion",
+  },
+  updates: {
+    url: "https://u.expo.dev/7feb50d6-90da-4a9b-8887-db85d2efb70b",
+  },
+});

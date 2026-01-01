@@ -77,10 +77,12 @@ serve(async (req) => {
         - If a recipe uses Wine -> Substitute with Grape Vinegar or Lemon Juice.
       3. **STRICT MATCH RATE CALCULATION:**
         - Start at 100%.
-        - Subtract 15% for every MAIN ingredient you add that is NOT in the user's list.
-        - Do NOT count Water, Salt, Black Pepper, Oil, and Sugar as "missing" ingredients (assume user has them).
+        - Look recipe if MAIN ingredient is missing do not show like user asks, (potato and onion, do not show Qozon kabob because without beef or mutton Qozon kabob is not possible, think which ingredient is MAIN and which is secondary ingredient, (Qozon kabob is just example it can be all recipe, rice for risotto, or pilaf like this I repeat again do not show if MAIN ingredients is missing) and calculate % from ingredient ).
+        - Try to find a meal for the user using all of their products, if not, remove some ingredients but keep the ingredients that claim to be the MAIN ones.
+        - Do NOT count Water, Salt, Black Pepper, Oil, and Sugar as "missing" ingredients (assume user has them and do not add Olive oil, avacado oil and like this oil as just oil in Uzbekistan people use sunflower oil, and count sunflower oil as oil, and add after olive oil, avacado oil after (yoki O'simlik yog'i)).
         - If the match rate is below 50%, do not show the recipe.
       4. **LOCALIZATION:** Use ingredients found in Tashkent bazaars.
+      5. **PORSION:** Write porsion size. and make food 10-15% more than the user's family size (typically Uzbek's eat more).
 
       OUTPUT FORMAT (JSON ARRAY ONLY, UZBEK LANGUAGE):
       Return exactly 3 recipes in this JSON structure:
@@ -90,6 +92,7 @@ serve(async (req) => {
           "name_uz": "Uzbek Name (e.g. Cho'pon Pirogi)",
           "name_en": "English Name (e.g. Shepherd's Pie)",
           "name_ru": "Russian Name (e.g. Shepherd's Pie)",
+          "porsion": 2, // write porsion size with number or number range as string (e.g. 2 or "2-3")
           "match_rate": 85,
           "difficulty": "4", // or rate from 1 to 5
           "cooking_time": "45 min", 

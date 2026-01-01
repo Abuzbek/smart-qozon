@@ -62,6 +62,11 @@ export function ResultCard({ recipe, onPress }: ResultCardProps) {
           <Text style={styles.metaText}>{recipe.cooking_time}</Text>
         </View>
         <View style={styles.metaItem}>
+          {/* Using a simple text or icon for portion */}
+          <Text style={{ fontSize: 16 }}>👥</Text>
+          <Text style={styles.metaText}>{recipe.porsion || 2} kishilik</Text>
+        </View>
+        <View style={styles.metaItem}>
           <Flame size={16} color={Colors.light.primary} />
           <Text style={styles.metaText}>{recipe.calories}</Text>
         </View>

@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useIngredientsStore } from "@/store/ingredientsStore";
 import { Recipe, useRecipeStore } from "@/store/recipeStore";
 import { useUserStore } from "@/store/userStore";
+import { getDeviceId } from "@/utils/getDeviceId";
 import { Image } from "expo-image";
 import { ArrowLeft, ChefHat, RotateCcw } from "lucide-react-native";
 import React, { useState } from "react";
@@ -31,6 +32,7 @@ const MOCK_RECIPE: Recipe[] = [
     cooking_time: "25 daqiqa",
     cuisine_type: "O'zbek",
     calories: "350 kkal",
+    porsion: "2",
     ingredients: [
       { name: "Kartoshka", amount: "3 dona" },
       { name: "Tuxum", amount: "4 dona" },
@@ -77,6 +79,7 @@ export default function HomeScreen() {
     setLoading(true);
     try {
       const familyProfile = useUserStore.getState().family;
+      const deviceId = await getDeviceId();
 
       // Call Supabase Edge Function
       const { data, error } = await supabase.functions.invoke(
@@ -84,6 +87,7 @@ export default function HomeScreen() {
         {
           body: {
             ingredients: selectedIngredients,
+            device_id: deviceId, // Pass device ID for rate limiting
             familyConfig: {
               adults: familyProfile?.adults || 2,
               children: familyProfile?.children || 2,

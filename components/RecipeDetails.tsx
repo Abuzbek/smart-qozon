@@ -1,6 +1,13 @@
 import { Colors } from "@/constants/Colors";
 import { Recipe, useRecipeStore } from "@/store/recipeStore";
-import { ArrowLeft, Bookmark, Clock, Flame, Globe } from "lucide-react-native";
+import {
+  ArrowLeft,
+  Bookmark,
+  Clock,
+  Flame,
+  Globe,
+  Users,
+} from "lucide-react-native";
 import React from "react";
 import {
   ScrollView,
@@ -55,6 +62,10 @@ export function RecipeDetails({ recipe, onBack }: RecipeDetailsProps) {
           <View style={styles.metaItem}>
             <Clock size={16} color={Colors.light.text} />
             <Text style={styles.metaText}>{recipe?.cooking_time || "-"}</Text>
+          </View>
+          <View style={styles.metaItem}>
+            <Users size={16} color={Colors.light.text} />
+            <Text style={styles.metaText}>{recipe?.porsion || 2} kishilik</Text>
           </View>
           <View style={styles.metaItem}>
             <Flame size={16} color={Colors.light.primary} />
