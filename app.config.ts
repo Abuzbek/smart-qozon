@@ -15,7 +15,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   },
   android: {
     adaptiveIcon: {
-      backgroundColor: "#F78938",
+      backgroundColor: "#F0E9DE",
       foregroundImage: "./assets/images/adaptive-icon.png",
     },
     edgeToEdgeEnabled: true,
@@ -23,7 +23,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
     package: "com.abuzcoder.smartqozon",
   },
   web: {
-    // bundler: "metro",
+    bundler: "metro",
     output: "static",
     favicon: "./assets/favicon.png",
   },
@@ -35,9 +35,9 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
         image: "./assets/images/transparent_logo.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#F78938",
+        backgroundColor: "#F0E9DE",
         dark: {
-          backgroundColor: "#F78938",
+          backgroundColor: "#F0E9DE",
         },
       },
     ],
