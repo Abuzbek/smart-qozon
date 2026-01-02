@@ -3,42 +3,38 @@ import * as Device from "expo-device";
 import { Platform } from "react-native";
 import { supabase } from "./supabase";
 
-export const syncUserDevice = async (phoneNumber: string | null = null) => {
+export const syncUserDevice = async (phoneNumber: string) => {
   try {
+    // 1. Prepare User Data
+    // We remove spaces so "+998 90" and "+99890" are treated as the same user
+    const cleanPhone = phoneNumber.replace(/\s/g, "");
     const deviceId = await getDeviceId();
-
-    // 2. Get Model Name
     const modelName = Device.modelName || "Unknown Device";
 
-    // 3. Prepare Data
-    const userData: any = {
-      device_id: deviceId,
-      device_model: modelName,
+    const userData = {
+      phone_number: cleanPhone, // This is now our "Key"
+      device_id: deviceId, // Update to current device
+      device_model: modelName, // Update to current model
       platform: Platform.OS,
       last_seen_at: new Date().toISOString(),
     };
 
-    // Only update phone number if we actually have one
-    if (phoneNumber) {
-      userData.phone_number = phoneNumber;
-    }
-
-    // 4. Send to Supabase
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("app_users")
-      .upsert(userData, { onConflict: "id" });
-    if (error) {
-      console.error("User Sync Error:", error.message);
-    } else {
-      // console.log("User Synced:", modelName);
-    }
+      .upsert(userData, {
+        onConflict: "phone_number",
+        ignoreDuplicates: false,
+      })
+      .select()
+      .single();
 
-    return { deviceId, modelName };
+    return data;
   } catch (e) {
     console.error("Sync Failed:", e);
     return null;
   }
 };
+
 export const getUserDevice = async (deviceId: string) => {
   try {
     const { data, error } = await supabase
