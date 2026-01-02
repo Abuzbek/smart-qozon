@@ -26,10 +26,12 @@ export interface Recipe {
 interface RecipeState {
   recentRecipes: Recipe[];
   savedRecipes: Recipe[];
+  history: Recipe[];
   addRecentRecipes: (recipes: Recipe[]) => void;
   saveRecipe: (recipe: Recipe) => void;
   removeSavedRecipe: (recipe: Recipe) => void;
   isRecipeSaved: (recipe: Recipe) => boolean;
+  addToHistory: (recipe: Recipe) => void;
 }
 
 const mmkvStorage: StateStorage = {
@@ -45,11 +47,14 @@ const mmkvStorage: StateStorage = {
   },
 };
 
+const getRecipeId = (r: Recipe) => `${r.name_uz}_${r.name_original || ""}`;
+
 export const useRecipeStore = create<RecipeState>()(
   persist(
     (set, get) => ({
       recentRecipes: [],
       savedRecipes: [],
+      history: [],
       addRecentRecipes: (newRecipes) => {
         set((state) => {
           // Add new recipes to the beginning of the list
@@ -64,7 +69,8 @@ export const useRecipeStore = create<RecipeState>()(
       },
       saveRecipe: (recipe) => {
         set((state) => {
-          if (state.savedRecipes.some((r) => r.name_uz === recipe.name_uz)) {
+          const id = getRecipeId(recipe);
+          if (state.savedRecipes.some((r) => getRecipeId(r) === id)) {
             return state;
           }
           return { savedRecipes: [recipe, ...state.savedRecipes] };
@@ -73,12 +79,30 @@ export const useRecipeStore = create<RecipeState>()(
       removeSavedRecipe: (recipe) => {
         set((state) => ({
           savedRecipes: state.savedRecipes.filter(
-            (r) => r.name_uz !== recipe.name_uz
+            (r) => getRecipeId(r) !== getRecipeId(recipe)
           ),
         }));
       },
       isRecipeSaved: (recipe) => {
-        return get().savedRecipes.some((r) => r.name_uz === recipe.name_uz);
+        const id = getRecipeId(recipe);
+        return get().savedRecipes.some((r) => getRecipeId(r) === id);
+      },
+      addToHistory: (recipe) => {
+        set((state) => {
+          const id = getRecipeId(recipe);
+          // Avoid immediate duplicates at the top
+          if (
+            state.history.length > 0 &&
+            getRecipeId(state.history[0]) === id
+          ) {
+            return state;
+          }
+          // Filter out previous instances to bump to top? Or just straight list?
+          // "Record all recipes" - usually implies a proper history log.
+          // Moving to top is better UX.
+          const filtered = state.history.filter((r) => getRecipeId(r) !== id);
+          return { history: [recipe, ...filtered].slice(0, 100) };
+        });
       },
     }),
     {

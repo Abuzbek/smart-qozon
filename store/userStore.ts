@@ -23,10 +23,10 @@ interface UserState {
   id: string | null;
   isLoggedIn: boolean;
   setUserData: (data: {
-    phone: string;
-    deviceModel: string;
-    deviceId: string;
-    id: string;
+    phone?: string;
+    deviceModel?: string;
+    deviceId?: string;
+    id?: string;
   }) => void;
   logout: () => void;
   setFamily: (family: { adults: number; children: number }) => void;

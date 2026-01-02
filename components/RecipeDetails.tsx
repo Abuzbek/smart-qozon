@@ -23,8 +23,13 @@ interface RecipeDetailsProps {
 }
 
 export function RecipeDetails({ recipe, onBack }: RecipeDetailsProps) {
-  const { saveRecipe, removeSavedRecipe, isRecipeSaved } = useRecipeStore();
+  const { saveRecipe, removeSavedRecipe, isRecipeSaved, addToHistory } =
+    useRecipeStore();
   const saved = isRecipeSaved(recipe);
+
+  React.useEffect(() => {
+    addToHistory(recipe);
+  }, [recipe]);
 
   const handleSave = () => {
     if (saved) {

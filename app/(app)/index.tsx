@@ -1,9 +1,9 @@
+import transparentLogo from "@/assets/images/transparent_logo.png";
 import { Colors } from "@/constants/Colors";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import transparentLogo from "../assets/images/transparent_logo.png";
 
 export default function WelcomeScreen() {
   const router = useRouter();
