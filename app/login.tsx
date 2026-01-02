@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/userStore";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { Minus, Plus } from "lucide-react-native";
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import {
   Alert,
   Keyboard,
@@ -40,33 +40,36 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     setLoading(true);
     try {
-      // Sync user to backend
-      const result = await syncUserDevice(phone);
-
-      if (result) {
-        // Update global store
-        useUserStore.getState().setUserData({
-          phone: phone,
-          deviceModel: result.modelName,
-          deviceId: result.deviceId,
-        });
-
-        useUserStore.getState().setFamily({
-          adults,
-          children,
-        });
-        // Go to home
-        router.replace("/(tabs)");
-      } else {
-        throw new Error("Device sync failed");
+      // 1. Validation (Clean spaces before checking length)
+      const cleanPhone = phone.replace(/\s/g, "");
+      if (cleanPhone.length < 13) {
+        Alert.alert("Xatolik", "Iltimos, to'g'ri raqam kiriting");
+        setLoading(false);
+        return;
       }
+
+      useUserStore.getState().setFamily({ adults, children });
+
+      // 3. Navigate immediately!
+      router.replace("/(tabs)");
+
+      // 4. Run the DB Sync in the background
+      // We do NOT await this. It happens while the user is already looking at recipes.
+      syncUserDevice(phone)
+        .catch((err) => {
+          console.warn("Background sync error:", err);
+          // Optional: Add retry logic here if needed
+        })
+        .then((data) => {
+          useUserStore.getState().setUserData({
+            id: data.userId,
+            phone: data.phone_number,
+            deviceModel: data.device_model,
+            deviceId: data.device_id,
+          });
+        });
     } catch (error) {
       console.error(error);
-      Alert.alert(
-        "Xatolik",
-        "Tizimga kirishda xatolik yuz berdi" + JSON.stringify(error)
-      );
-    } finally {
       setLoading(false);
     }
   };
@@ -99,10 +102,14 @@ export default function LoginScreen() {
       </View>
     </View>
   );
+  const DismissKeyboardWrapper =
+    Platform.OS === "web" ? Fragment : TouchableWithoutFeedback;
+  const dismissKeyboardProps =
+    Platform.OS === "web" ? {} : { onPress: Keyboard.dismiss };
 
   return (
     <SafeAreaView style={styles.container}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <DismissKeyboardWrapper {...dismissKeyboardProps}>
         <KeyboardAvoidingView
           style={[styles.content]}
           keyboardVerticalOffset={0}
@@ -153,7 +160,7 @@ export default function LoginScreen() {
             </Text>
           </TouchableOpacity>
         </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
+      </DismissKeyboardWrapper>
     </SafeAreaView>
   );
 }

@@ -58,6 +58,7 @@ const styles = StyleSheet.create({
     height: 150,
     marginBottom: 40,
     gap: 10,
+    width: "100%",
   },
   logo: {
     width: "100%",
@@ -88,7 +89,7 @@ const styles = StyleSheet.create({
   button: {
     backgroundColor: Colors.light.primary,
     paddingVertical: 16,
-    borderRadius: 12,
+    borderRadius: 100,
     alignItems: "center",
   },
   buttonText: {

@@ -171,8 +171,10 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: "row",
     justifyContent: "center",
+    flexWrap: "wrap",
     gap: 16,
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   metaItem: {
     flexDirection: "row",

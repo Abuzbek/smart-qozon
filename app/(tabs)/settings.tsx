@@ -232,9 +232,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     backgroundColor: Colors.light.background,
     padding: 12,
-    borderRadius: 12,
+    borderRadius: 100,
     borderWidth: 1,
-    borderColor: "#EEE",
+    borderColor: Colors.light.text,
   },
   counterLabel: {
     fontSize: 16,
