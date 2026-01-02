@@ -30,25 +30,20 @@ export default function RootLayout() {
     const initApp = async () => {
       const deviceId = useUserStore.getState().deviceId;
       try {
-        if (!deviceId) {
-          setTimeout(() => {
-            router.replace("/login" as any);
-          }, 0);
-          return;
+        if (deviceId) {
+          // Run silently in background
+          await getUserDevice(deviceId);
         }
-        // Run silently in background
-        await getUserDevice(deviceId);
 
         // Checklist
         const isLoggedIn = useUserStore.getState().isLoggedIn;
 
         // Sync Ingredients
-        syncIngredients();
+        await syncIngredients();
 
-        if (!isLoggedIn) {
-          // We need to wait a tick for navigation to be ready
+        if (isLoggedIn) {
           setTimeout(() => {
-            router.replace("/login" as any);
+            router.replace("/(tabs)");
           }, 0);
         }
       } catch (e) {
@@ -99,6 +94,7 @@ export default function RootLayout() {
   return (
     <KeyboardProvider>
       <Stack>
+        <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen
           name="(tabs)"
